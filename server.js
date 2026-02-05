@@ -55,7 +55,7 @@ app.post("/api/initiate", async (req, res) => {
         }
 
         const payload = {
-            amount: Number(amt.toFixed(2)),
+            amount: Number,
             userEmail: userEmail.trim(),
             userId: userId.trim(),
             webhookReturnURL: WEBHOOK_URL,
