@@ -20,7 +20,7 @@ app.use(
  * HARD-CODED CONFIG FOR TESTING ONLY
  * Replace the API key string and deploy.
  */
-const TFIN_API_KEY = "PASTE_YOUR_API_KEY_HERE"; // <-- paste your key here (testing only)
+const TFIN_API_KEY = "bdb03c89-150a-4734-ad70-0ae4836431db"; // <-- paste your key here (testing only)
 const INITIATE_URL = "https://p2-back.onrender.com/transaction/payment/initiate";
 
 // Use your Render backend domain (hard-coded). You gave:
