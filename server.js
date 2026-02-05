@@ -48,11 +48,6 @@ app.post("/api/initiate", async (req, res) => {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        if (!TFIN_API_KEY || TFIN_API_KEY === "bdb03c89-150a-4734-ad70-0ae4836431db") {
-            return res.status(500).json({
-                error: "TFIN_API_KEY is not set in server.js (paste your key).",
-            });
-        }
 
         const payload = {
             amount: Number,
