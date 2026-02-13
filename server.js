@@ -37,7 +37,7 @@ let latestWebhooks = []; // store last 20 webhooks (memory only)
  * Set these in Render environment variables:
  * PARTNER_HOST, PARTNER_RESOURCE, PARTNER_SID, PARTNER_SECRETKEY
  */
-const PARTNER_HOST = "https://payments1.betconstruct.com"; // e.g. "https://provider.example.com"
+const PARTNER_HOST = "https://payments.betconstruct.com"; // e.g. "https://provider.example.com"
 const PARTNER_RESOURCE = "TerminalCallbackPG"; // e.g. "MyResource"
 const PARTNER_SID = "18756444"; // provider sid
 const PARTNER_SECRETKEY = "P3kyCMTph4JJ8gECK20EbByh"; // provider secret key (keep secret)
