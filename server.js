@@ -323,6 +323,30 @@ app.post("/api/deposit/status", async (req, res) => {
     }
 });
 
+
+app.get("/api/partner/list-errors", async (req, res) => {
+    try {
+        if (!PARTNER_SID) throw new Error("Missing PARTNER_SID");
+
+        const url = new URL(providerBaseUrl());
+        url.search = new URLSearchParams({
+            command: "list_errors",
+            sid: PARTNER_SID,
+        }).toString();
+
+        const r = await fetch(url.toString(), { method: "GET" });
+        const text = await r.text();
+
+        let data;
+        try { data = JSON.parse(text); } catch { data = { raw: text }; }
+
+        res.status(r.status).json({ status: r.status, ok: r.ok, url: url.toString(), data });
+    } catch (e) {
+        res.status(500).json({ error: "Server error", message: String(e?.message || e) });
+    }
+});
+
+
 app.post("/api/deposit/cancel", async (req, res) => {
     try {
         const { txnId } = req.body || {};
