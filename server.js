@@ -56,6 +56,38 @@ function providerBaseUrl() {
     )}/`;
 }
 
+app.get("/api/partner/check-direct", async (req, res) => {
+    try {
+        const url =
+            "https://payments1.betconstruct.com/Bets/PaymentsCallback/TerminalCallbackPG/?" +
+            "command=check&sid=18756444&account=385441885&currency=TND&hashcode=01a5692a1e2db7afe768e8dd8f316583";
+
+        const r = await fetch(url, { method: "GET" });
+        const text = await r.text();
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            data = { raw: text };
+        }
+
+        return res.status(r.ok ? 200 : r.status).json({
+            ok: r.ok,
+            status: r.status,
+            url,
+            data,
+        });
+    } catch (e) {
+        return res.status(500).json({
+            ok: false,
+            error: "Server error",
+            message: String(e?.message || e),
+        });
+    }
+});
+
+
 async function callPartnerApi({ command, params, hashcode }) {
     if (!PARTNER_SID || !PARTNER_SECRETKEY) {
         throw new Error("Missing PARTNER_SID or PARTNER_SECRETKEY env vars");
