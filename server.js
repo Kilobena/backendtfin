@@ -88,6 +88,8 @@ app.get("/api/partner/check-direct", async (req, res) => {
 });
 
 
+
+
 async function callPartnerApi({ command, params, hashcode }) {
     if (!PARTNER_SID || !PARTNER_SECRETKEY) {
         throw new Error("Missing PARTNER_SID or PARTNER_SECRETKEY env vars");
