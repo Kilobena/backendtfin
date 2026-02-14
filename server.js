@@ -201,11 +201,8 @@ app.post("/api/deposit", async (req, res) => {
     try {
         const { userId, amount, currency, txnId } = req.body || {};
 
-        const uid = Number(userId);
-        if (!Number.isInteger(uid) || uid <= 0) {
-            return res.status(400).json({ error: "userId must be a positive integer" });
-        }
-        const userIdStr = String(uid);
+
+        const userIdStr = (userId);
 
         const amt = Number(amount);
         if (!Number.isFinite(amt) || amt <= 0) {
