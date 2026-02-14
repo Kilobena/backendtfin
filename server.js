@@ -199,11 +199,13 @@ app.get("/api/webhook/latest", (req, res) => {
  */
 app.post("/api/deposit", async (req, res) => {
     try {
-        const { userId, amount, currency = "EUR", txnId } = req.body || {};
+        const { userId, amount, currency, txnId } = req.body || {};
 
-        if (!userId || typeof userId !== "string") {
-            return res.status(400).json({ error: "userId is required" });
+        const uid = Number(userId);
+        if (!Number.isInteger(uid) || uid <= 0) {
+            return res.status(400).json({ error: "userId must be a positive integer" });
         }
+        const userIdStr = String(uid);
 
         const amt = Number(amount);
         if (!Number.isFinite(amt) || amt <= 0) {
@@ -213,6 +215,10 @@ app.post("/api/deposit", async (req, res) => {
         if (!currency || typeof currency !== "string") {
             return res.status(400).json({ error: "currency is required" });
         }
+        const curr = currency.trim();
+        if (!curr) {
+            return res.status(400).json({ error: "currency is required" });
+        }
 
         const finalTxnId = (txnId && String(txnId)) || crypto.randomUUID();
 
@@ -220,12 +226,12 @@ app.post("/api/deposit", async (req, res) => {
         // hash = md5(command + account + currency + sid + secret)
         const checkCommand = "check";
         const checkHash = md5Hex(
-            checkCommand + userId + currency + PARTNER_SID + PARTNER_SECRETKEY
+            checkCommand + userIdStr + curr + PARTNER_SID + PARTNER_SECRETKEY
         );
 
         const checkResp = await callPartnerApi({
             command: checkCommand,
-            params: { account: userId, currency },
+            params: { account: userIdStr, currency: curr },
             hashcode: checkHash,
         });
 
@@ -245,14 +251,13 @@ app.post("/api/deposit", async (req, res) => {
 
         // 2) PAY (DEPOSIT)
         // hash = md5(command + trx_id + account + amount + currency + sid + secret)
-        // Param often named txn_id in URL; we use finalTxnId for both.
         const payCommand = "pay";
         const payHash = md5Hex(
             payCommand +
             finalTxnId +
-            userId +
+            userIdStr +
             String(amt) +
-            currency +
+            curr +
             PARTNER_SID +
             PARTNER_SECRETKEY
         );
@@ -260,9 +265,9 @@ app.post("/api/deposit", async (req, res) => {
         const payResp = await callPartnerApi({
             command: payCommand,
             params: {
-                account: userId,
+                account: userIdStr,
                 amount: String(amt),
-                currency,
+                currency: curr,
                 txn_id: finalTxnId,
             },
             hashcode: payHash,
@@ -285,9 +290,9 @@ app.post("/api/deposit", async (req, res) => {
 
         return res.json({
             ok: true,
-            userId,
+            userId: uid,      // return as integer
             amount: amt,
-            currency,
+            currency: curr,
             txnId: finalTxnId,
             check: checkResp.data,
             deposit: payResp.data,
