@@ -212,7 +212,7 @@ app.post("/api/deposit", async (req, res) => {
         if (!currency || typeof currency !== "string") {
             return res.status(400).json({ error: "currency is required" });
         }
-        const curr = currency.trim();
+        const curr = "TND";
         if (!curr) {
             return res.status(400).json({ error: "currency is required" });
         }
