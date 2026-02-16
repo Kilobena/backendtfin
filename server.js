@@ -321,7 +321,7 @@ app.post("/api/deposit", async (req, res) => {
 
         return res.json({
             ok: true,
-            userId: uid,      // return as integer
+            userId: userIdStr,      // return as integer
             amount: amt,
             currency: curr,
             txnId: finalTxnId,
