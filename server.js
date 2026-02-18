@@ -235,35 +235,44 @@ app.post("/api/deposit", async (req, res) => {
     try {
         const { userId, amount, currency, txnId } = req.body || {};
 
-
-        const userIdStr = (userId);
-
+        const userIdStr = String(userId);
         const amt = Number(amount);
+
         if (!Number.isFinite(amt) || amt <= 0) {
             return res.status(400).json({ error: "Invalid amount (must be > 0)" });
         }
 
+        // ✅ Take currency from request body
         if (!currency || typeof currency !== "string") {
             return res.status(400).json({ error: "currency is required" });
         }
-        const curr = "TND";
-        if (!curr) {
-            return res.status(400).json({ error: "currency is required" });
-        }
+
+        const curr = currency.trim().toUpperCase();
 
         const finalTxnId = (txnId && String(txnId)) || crypto.randomUUID();
 
         // 1) CHECK
-        // hash = md5(command + account + currency + sid + secret)
         const checkCommand = "check";
+
         const checkHash = md5Hex(
-            checkCommand + userIdStr + curr + PARTNER_SID + PARTNER_SECRETKEY
+            checkCommand +
+            userIdStr +
+            curr +
+            PARTNER_SID +
+            PARTNER_SECRETKEY
         );
 
         const checkResp = await callPartnerApi({
             command: checkCommand,
-            params: { account: userIdStr, currency: curr },
+            params: {
+                account: userIdStr,
+                currency: curr,
+            },
             hashcode: checkHash,
+            // ✅ Static GET parameter
+            extraQuery: {
+                paymentID: "3799",
+            },
         });
 
         if (!checkResp.ok) {
@@ -281,8 +290,8 @@ app.post("/api/deposit", async (req, res) => {
         }
 
         // 2) PAY (DEPOSIT)
-        // hash = md5(command + trx_id + account + amount + currency + sid + secret)
         const payCommand = "pay";
+
         const payHash = md5Hex(
             payCommand +
             finalTxnId +
@@ -302,6 +311,10 @@ app.post("/api/deposit", async (req, res) => {
                 txn_id: finalTxnId,
             },
             hashcode: payHash,
+            // ✅ Static GET parameter
+            extraQuery: {
+                paymentID: "3799",
+            },
         });
 
         if (!payResp.ok) {
@@ -321,13 +334,14 @@ app.post("/api/deposit", async (req, res) => {
 
         return res.json({
             ok: true,
-            userId: userIdStr,      // return as integer
+            userId: userIdStr,
             amount: amt,
             currency: curr,
             txnId: finalTxnId,
             check: checkResp.data,
             deposit: payResp.data,
         });
+
     } catch (e) {
         return res.status(500).json({
             error: "Server error",
@@ -335,6 +349,7 @@ app.post("/api/deposit", async (req, res) => {
         });
     }
 });
+
 
 /**
  * OPTIONAL: status + cancel
