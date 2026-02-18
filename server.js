@@ -90,18 +90,32 @@ app.get("/api/partner/check-direct", async (req, res) => {
 
 
 
-async function callPartnerApi({ command, params, hashcode }) {
+async function callPartnerApi({ command, params, hashcode, extraQuery = {} }) {
     if (!PARTNER_SID || !PARTNER_SECRETKEY) {
         throw new Error("Missing PARTNER_SID or PARTNER_SECRETKEY env vars");
     }
 
     const url = new URL(providerBaseUrl());
+
+    // Base required params
     const sp = new URLSearchParams({
         command,
         sid: PARTNER_SID,
         ...params,
         hashcode,
     });
+
+    // ✅ Add static GET parameter paymentID=3799
+    sp.append("paymentID", "3799");
+
+    // ✅ If extraQuery is passed, append those too
+    if (extraQuery && typeof extraQuery === "object") {
+        for (const [key, value] of Object.entries(extraQuery)) {
+            if (value !== undefined && value !== null) {
+                sp.append(key, String(value));
+            }
+        }
+    }
 
     url.search = sp.toString();
 
@@ -118,12 +132,8 @@ async function callPartnerApi({ command, params, hashcode }) {
     if (!r.ok) {
         return { ok: false, status: r.status, data, url: url.toString() };
     }
-    return { ok: true, status: r.status, data, url: url.toString() };
-}
 
-function isProviderSuccess(resp) {
-    // expected: { response: { code: 0, message: "OK" } }
-    return resp?.data?.response?.code === 0;
+    return { ok: true, status: r.status, data, url: url.toString() };
 }
 
 /**
