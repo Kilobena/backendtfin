@@ -135,6 +135,9 @@ async function callPartnerApi({ command, params, hashcode, extraQuery = {} }) {
     return { ok: true, status: r.status, data, url: url.toString() };
 }
 
+
+function isProviderSuccess(resp) { // expected: { response: { code: 0, message: "OK" } }
+    return resp?.data?.response?.code === 0; }
 /**
  * ================================
  * ROUTES
