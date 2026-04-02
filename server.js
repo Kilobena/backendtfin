@@ -59,8 +59,7 @@ function providerBaseUrl() {
 app.get("/api/partner/check-direct", async (req, res) => {
     try {
         const url =
-            "https://payments1.betconstruct.com/Bets/PaymentsCallback/TerminalCallbackPG/?command=check&sid=18756444&account=1765074688&currency=TND&hashcode=47f8263e74d1b4a1886a85fe73b834fb&paymentID=3799";
-
+            "https://payments1.betconstruct.com/Bets/PaymentsCallback/TerminalCallbackPG/?command=check&account=401220221&currency=NSP&sid=18756444&hashcode=75a54334e6e06bb1891b34afd4e90a2b"
         const r = await fetch(url, { method: "GET" });
         const text = await r.text();
 
